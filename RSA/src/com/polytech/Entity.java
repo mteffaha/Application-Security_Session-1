@@ -6,7 +6,7 @@ import javax.crypto.*;
 
 import java.io.*;
 
-public class SqueletonEntity{
+public class Entity {
 
 
 	// keypair
@@ -17,7 +17,7 @@ public class SqueletonEntity{
 	 * Entity Constructor
 	 * Public / Private Key generation
 	 **/
-	public SqueletonEntity(){
+	public Entity(){
 		// INITIALIZATION
 
 		// generate a public/private key

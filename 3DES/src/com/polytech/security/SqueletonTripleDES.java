@@ -8,16 +8,17 @@ import javax.crypto.spec.*;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.net.URL;
 import java.security.*;
 import java.util.*;
 
 public class SqueletonTripleDES{
 
-
 	private static final int KEYS_COUNT = 3;
 
 	static public void main(String[] argv){
-		
+
+
 		Provider prov = new org.bouncycastle.jce.provider.BouncyCastleProvider();
 		Security.addProvider(prov);
 		
@@ -94,9 +95,9 @@ public class SqueletonTripleDES{
 
 			}
 
-			storeKey(keys.get(0),"DESKey1");
-			storeKey(keys.get(1),"DESKey2");
-			storeKey(keys.get(2),"DESKey3");
+			storeKey(keys.get(0),"ebc/DESKey1");
+			storeKey(keys.get(1),"ebc/DESKey2");
+			storeKey(keys.get(2),"ebc/DESKey3");
 
 			// CREATE A DES CIPHER OBJECT 
 				// WITH CipherInstanceName
@@ -220,12 +221,12 @@ public class SqueletonTripleDES{
 
 			keys.add(ivSpec);
 
-			storeKey((Key) keys.get(0),"DESKey1");
-			storeKey((Key) keys.get(1),"DESKey2");
-			storeKey((Key) keys.get(2), "DESKey3");
+			storeKey((Key) keys.get(0),"cbc/DESKey1");
+			storeKey((Key) keys.get(1),"cbc/DESKey2");
+			storeKey((Key) keys.get(2),"cbc/DESKey3");
 
 
-			FileOutputStream outIv = new FileOutputStream("IvSpec");
+			FileOutputStream outIv = new FileOutputStream("cbc/IvSpec");
 			outIv.write(ivSpec.getIV());
 			//Close the output stream
 			outIv.close();

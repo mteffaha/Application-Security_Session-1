@@ -6,7 +6,6 @@ package com.polytech;
 * asymetric clearTextFile SignatureFile CipheredFile DecipheredFile
 **/
 
-import java.security.*;
 import java.io.*;
 
 public class Asymetric{
@@ -15,15 +14,9 @@ public class Asymetric{
 
 		// INITIALIZATION
 
-        /*
-		// load the bouncycastle provider
-		Provider prov = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-		Security.addProvider(prov);
-		*/
-
 		// create two new entity
-		SqueletonEntity Alice = new SqueletonEntity();
-		SqueletonEntity Bob = new SqueletonEntity();
+		Entity Alice = new Entity();
+		Entity Bob = new Entity();
 		
 		try{
 		

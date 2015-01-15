@@ -14,14 +14,16 @@ public class Asymetric{
 	static public void main(String argv[]){
 
 		// INITIALIZATION
-		
+
+        /*
 		// load the bouncycastle provider
-		//Provider prov = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-		//Security.addProvider(prov);
+		Provider prov = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+		Security.addProvider(prov);
+		*/
 
 		// create two new entity
-		Entity Alice = new Entity();
-		Entity Bob = new Entity();
+		SqueletonEntity Alice = new SqueletonEntity();
+		SqueletonEntity Bob = new SqueletonEntity();
 		
 		try{
 		

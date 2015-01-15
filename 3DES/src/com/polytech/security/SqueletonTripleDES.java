@@ -28,7 +28,6 @@ public class SqueletonTripleDES{
 				SqueletonTripleDES the3DES = new SqueletonTripleDES();
 			
 				if(argv[0].compareTo("-ECB")==0){
-					System.out.println("ECB Mode");
 					// EBC mode
 				  	// encrypt EBC mode
 				  	Vector Parameters= 
@@ -84,7 +83,6 @@ public class SqueletonTripleDES{
 							String KeyGeneratorInstanceName, 
 							String CipherInstanceName){
 		try{
-			System.out.println("============ Encryption Began");
 			Vector<SecretKey> keys = new Vector<SecretKey>();
 			Vector<Cipher> ciphers = new Vector<Cipher>();
 		
@@ -93,7 +91,13 @@ public class SqueletonTripleDES{
 
 			for(int i=0;i< KEYS_COUNT;i++){
 				keys.add(keyGenerator.generateKey());
+
 			}
+
+			storeKey(keys.get(0),"DESKey1");
+			storeKey(keys.get(1),"DESKey2");
+			storeKey(keys.get(2),"DESKey3");
+
 			// CREATE A DES CIPHER OBJECT 
 				// WITH CipherInstanceName
 				// FOR ENCRYPTION 
@@ -114,7 +118,7 @@ public class SqueletonTripleDES{
 			ciphers.get(2).init(Cipher.ENCRYPT_MODE,keys.get(2));
 
 
-			// GET THE MESSAGE TO BE ENCRYPTED FROM N
+			// GET THE MESSAGE TO BE ENCRYPTED FROM N , plus add Zero paddings
 			byte inData[] = new byte[in.available()+(8-(in.available()%8))];
 			in.read(inData);
 			// CIPHERING     
@@ -195,36 +199,75 @@ public class SqueletonTripleDES{
 							String KeyGeneratorInstanceName, 
 							String CipherInstanceName){
 		try{
-		
+
+			Vector<Object> keys = new Vector<Object>();
+			Vector<Cipher> ciphers = new Vector<Cipher>();
+
 			// GENERATE 3 DES KEYS
-			// GENERATE THE IV
-		
-			// CREATE A DES CIPHER OBJECT 
-				// WITH CipherInstanceName
-				// FOR ENCRYPTION 
-				// WITH THE FIRST GENERATED DES KEY
-			
-			// CREATE A DES CIPHER OBJECT 
-				// WITH CipherInstanceName
-				// FOR DECRYPTION
-				// WITH THE SECOND GENERATED DES KEY
-				
-			// CREATE A DES CIPHER OBJECT 
-				// WITH CipherInstanceName 
-				// FOR ENCRYPTION
-				// WITH THE THIRD GENERATED DES KEY
-				
-			// GET THE DATA TO BE ENCRYPTED FROM IN 
-			
-			// CIPHERING     
-				// CIPHER WITH THE FIRST KEY
-				// DECIPHER WITH THE SECOND KEY
-				// CIPHER WITH THE THIRD KEY
+			KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyGeneratorInstanceName);
+
+			for(int i=0;i< KEYS_COUNT;i++){
+				keys.add(keyGenerator.generateKey());
+
+			}
+
+
+
+			SecureRandom random = new SecureRandom();
+			byte iv[] = new byte[8];
+			random.nextBytes(iv);
+			IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+			keys.add(ivSpec);
+
+			storeKey((Key) keys.get(0),"DESKey1");
+			storeKey((Key) keys.get(1),"DESKey2");
+			storeKey((Key) keys.get(2), "DESKey3");
+
+
+			FileOutputStream outIv = new FileOutputStream("IvSpec");
+			outIv.write(ivSpec.getIV());
+			//Close the output stream
+			outIv.close();
+
+
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR ENCRYPTION
+			// WITH THE FIRST GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(0).init(Cipher.ENCRYPT_MODE, (Key) keys.get(0), ivSpec);
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR DECRYPTION
+			// WITH THE SECOND GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(1).init(Cipher.DECRYPT_MODE, (Key) keys.get(1),ivSpec);
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR ENCRYPTION
+			// WITH THE THIRD GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(2).init(Cipher.ENCRYPT_MODE, (Key) keys.get(2),ivSpec);
+
+
+			// GET THE MESSAGE TO BE ENCRYPTED FROM N
+			byte inData[] = new byte[in.available()+(8-(in.available()%8))];
+			in.read(inData);
+			// CIPHERING
+			// CIPHER WITH THE FIRST KEY
+			byte[] ciphered = ciphers.get(0).doFinal(inData);
+			// DECIPHER WITH THE SECOND KEY
+			byte[] deciphered = ciphers.get(1).doFinal(ciphered);
+			// CIPHER WITH THE THIRD KEY
+			ciphered = ciphers.get(2).doFinal(deciphered);
+			// write encrypted file
+
 
 			// WRITE THE ENCRYPTED DATA IN OUT
-			
-			// return the DES keys list generated		
-			return null;
+			out.write(ciphered);
+			// return the DES keys list generated
+			return keys;
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -240,30 +283,41 @@ public class SqueletonTripleDES{
 						FileOutputStream out, 
 						String CipherInstanceName){
 		try{
-		
-			// CREATE A DES CIPHER OBJECT 
-				// WITH CipherInstanceName
-				// FOR DECRYPTION 
-				// WITH THE THIRD GENERATED DES KEY
-			
-			// CREATE A DES CIPHER OBJECT 
-				// WITH CipherInstanceName
-				// FOR DECRYPTION
-				// WITH THE SECOND GENERATED DES KEY
-				
-			// CREATE A DES CIPHER OBJECT WITH DES/EBC/PKCS5PADDING FOR ENCRYPTION
-				// WITH CipherInstanceName
-				// FOR ENCRYPTION
-				// WITH THE FIRST GENERATED DES KEY
-			
-			// GET ENCRYPTED DATA FROM IN
-			
-			// DECIPHERING     
-				// DECIPHER WITH THE THIRD KEY
-				// 	CIPHER WITH THE SECOND KEY
-				// 	DECIPHER WITH THE FIRST KEY
+
+			Vector<Cipher> ciphers = new Vector<Cipher>();
+
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR DECRYPTION
+			// WITH THE THIRD GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(0).init(Cipher.DECRYPT_MODE, (Key) Parameters.get(0),(IvParameterSpec)Parameters.get(3));
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR DECRYPTION
+			// WITH THE SECOND GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(1).init(Cipher.ENCRYPT_MODE, (Key) Parameters.get(1),(IvParameterSpec)Parameters.get(3));
+			// CREATE A DES CIPHER OBJECT
+			// WITH CipherInstanceName
+			// FOR ENCRYPTION
+			// WITH THE THIRD GENERATED DES KEY
+			ciphers.add(Cipher.getInstance(CipherInstanceName));
+			ciphers.get(2).init(Cipher.DECRYPT_MODE, (Key) Parameters.get(2),(IvParameterSpec)Parameters.get(3));
+
+			// GET THE ENCRYPTED DATA FROM IN
+			byte inData[] = new byte[in.available()];
+			in.read(inData);
+			// DECIPHERING
+			// DECIPHER WITH THE THIRD KEY
+			byte[] deciphered = ciphers.get(2).doFinal(inData);
+			// 	CIPHER WITH THE SECOND KEY
+			byte[] ciphered = ciphers.get(1).doFinal(deciphered);
+			// 	DECIPHER WITH THE FIRST KEY
+			deciphered = ciphers.get(0).doFinal(ciphered);
 
 			// WRITE THE DECRYPTED DATA IN OUT
+			out.write(deciphered);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -271,18 +325,39 @@ public class SqueletonTripleDES{
 
 	}
 
-
-
-	public static void doCopy(InputStream is, OutputStream os) throws IOException {
-		byte[] bytes = new byte[64];
-		int numBytes;
-		while ((numBytes = is.read(bytes)) != -1) {
-			os.write(bytes, 0, numBytes);
-		}
-		os.flush();
-		os.close();
-		is.close();
+	private void storeKey(Key key,String filename) throws IOException {
+		FileWriter fstream = new FileWriter(filename);
+		BufferedWriter out = new BufferedWriter(fstream);
+		out.write(Base64.getEncoder().encodeToString(key.getEncoded()));
+		//Close the output stream
+		out.close();
 	}
+
+
+	private SecretKey readKey(String filename,String KeyGeneratorInstanceName) throws IOException {
+		/*
+
+		 */
+		String encodedKey;
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		try {
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+
+			while (line != null) {
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			encodedKey = sb.toString();
+		} finally {
+			br.close();
+		}
+		byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+		return new SecretKeySpec(decodedKey, 0, decodedKey.length, KeyGeneratorInstanceName);
+	}
+
+
 	  
 
 }
